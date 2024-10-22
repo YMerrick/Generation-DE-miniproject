@@ -84,7 +84,7 @@ def update_order() -> None:
 
     # Get input for which key they would like to edit
     key_match = get_input("Please enter which property you would like to update: ")
-    while not any(key_match in _property for _property in order_selection.keys()):
+    while not any(filter(lambda key: key_match in key, order_selection.keys())):
         key_match = get_input("Please enter which property you would like to update: ")
     print_buffer()
     # Search for term in each key
