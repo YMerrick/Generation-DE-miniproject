@@ -1,10 +1,10 @@
 import os
 
-from decorators import get_input, menu
-from text_file_handler import TextFile
+from .decorators import get_input, menu
+from .text_file_handler import TextFile
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-relative_path = 'data\\courier_list.txt'
+relative_path = '/data/courier_list.txt'
 
 courier_list = TextFile(relative_path).load()
 

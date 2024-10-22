@@ -1,7 +1,7 @@
 from functools import wraps
 
-from text_file_handler import TextFile
-from product import relative_path, product_list, dir_path
+from .text_file_handler import TextFile
+from .product import relative_path, product_list, dir_path
 
 def get_num_input(prompt: str) -> int:
     input_flag = True

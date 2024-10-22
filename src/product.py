@@ -1,8 +1,8 @@
 # CREATE products list
 import os
 
-from decorators import menu, get_input, print_buffer, print_buffer_exit
-from text_file_handler import TextFile
+from .decorators import menu, get_input, print_buffer, print_buffer_exit
+from .text_file_handler import TextFile
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 relative_path = 'data/product_list.txt'

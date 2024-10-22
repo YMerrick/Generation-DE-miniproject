@@ -1,6 +1,6 @@
-from decorators import get_input, menu, print_buffer
-from product import product_menu
-from orders import order_menu
+from src.decorators import get_input, menu, print_buffer
+from src.product import product_menu
+from src.orders import order_menu
 
 # TO DO:
 # Implement order functions

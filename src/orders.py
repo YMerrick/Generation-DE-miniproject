@@ -1,9 +1,9 @@
 import os
 
-from decorators import get_input, menu, print_buffer, print_buffer_exit
+from .decorators import get_input, menu, print_buffer, print_buffer_exit
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-relative_path = 'data\\order_list.txt'
+relative_path = 'data/order_list.txt'
 
 order_list = [
     {
