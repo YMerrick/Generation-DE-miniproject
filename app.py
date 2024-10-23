@@ -1,6 +1,7 @@
 from src.decorators import get_input, menu, print_buffer
 from src.product import product_menu
 from src.orders import order_menu
+from src.couriers import courier_menu
 
 # TO DO:
 # Implement order functions
@@ -11,7 +12,8 @@ from src.orders import order_menu
 
 def print_main_menu():
     print("1. Products Menu")
-    print("2. Orders Menu")
+    print("2. Courier Menu")
+    print("3. Orders Menu")
     print("0. Exit")
 
 def main_menu_choice() -> bool:
@@ -21,6 +23,8 @@ def main_menu_choice() -> bool:
         case 1:
             product_menu()
         case 2:
+            courier_menu()
+        case 3:
             order_menu()
         case 0:
             return False
