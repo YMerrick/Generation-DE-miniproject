@@ -32,8 +32,8 @@ def print_buffer() -> None:
 def menu(func):
     '''Requires functions decorate to return a truthy value'''
     @wraps(func)
-    def wrapper_menu():
+    def wrapper_menu(*args, **kwargs):
         rerun_flag = True
         while rerun_flag:
-            rerun_flag = func()
+            rerun_flag = func(*args, **kwargs)
     return wrapper_menu 
