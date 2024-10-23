@@ -1,7 +1,7 @@
 from src.decorators import get_input, menu, print_buffer
-from src.product import product_menu
 from src.orders import order_menu
-from src.couriers import courier_menu
+from src.string_list_menu import menu_start
+from src.text_file_handler import TextFile
 
 # TO DO:
 # Implement order functions
@@ -9,6 +9,12 @@ from src.couriers import courier_menu
 # 
 
 # PRINT main menu options GET user input for main menu option
+
+prod_handler = TextFile('data/product_list.txt')
+prod_list = prod_handler.load()
+
+cour_handler = TextFile('data/courier_list.txt')
+cour_list = cour_handler.load()
 
 def print_main_menu():
     print("1. Products Menu")
@@ -21,9 +27,9 @@ def main_menu_choice() -> bool:
     print_buffer()
     match user_input:
         case 1:
-            product_menu()
+            menu_start('product', prod_handler, prod_list)
         case 2:
-            courier_menu()
+            menu_start('courier', cour_handler, cour_list)
         case 3:
             order_menu()
         case 0:
