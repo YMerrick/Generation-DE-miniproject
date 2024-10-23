@@ -42,9 +42,13 @@ class TextFile:
             with self as fh:
                 return fh.save(input_list)
         
-        if self.__file.closed:
-            pass
+        was_closed = self.__file.closed
+        if was_closed:
+            self.__file = open(self.filename, 'wt')
 
         self.__file.write('\n'.join(input_list))
+
+        if was_closed:
+            self.__file.close()
 
         return True
