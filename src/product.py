@@ -72,11 +72,12 @@ def product_menu_choice() -> bool:
         case 4:
             delete_product()
         case 0:
-            TextFile(relative_path).save(product_list)
+            TextFile(relative_path, 'wt').save(product_list)
             return False
         case _:
             print("Please select a valid option\n")
 
+    TextFile(relative_path, 'wt').save(product_list)
     return True
 
 @menu

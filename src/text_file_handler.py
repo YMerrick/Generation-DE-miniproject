@@ -2,18 +2,20 @@ from pathlib import Path
 
 class TextFile:
 
-    def __init__(self,filepath):
+    def __init__(self,filepath,* ,mode = 'r+t', **kwargs):
         self.filename = filepath
         self.__file = None
+        self.__mode = mode
+        self.__kwargs = kwargs
 
     def __enter__(self):
         try:
-            self.__file = open(self.filename, 'r+t')
+            self.__file = open(self.filename, self.__mode, **self.__kwargs)
         except FileNotFoundError:
-            Path("data/").mkdir(parents=True, exist_ok=True)
+            Path("data/").mkdir(parents=True, exist_ok=True, **self.__kwargs)
             self.__file = open(self.filename, 'x+t')
         except TypeError:
-            Path("data/").mkdir(parents=True, exist_ok=True)
+            Path("data/").mkdir(parents=True, exist_ok=True, **self.__kwargs)
             self.__file = open(f"data/{__name__}.txt", 'w+t')
         except Exception as ex:
             print(ex)
@@ -32,7 +34,7 @@ class TextFile:
             with self as fh:
                 return fh.load()
         
-        return [line.rstrip() for line in self.__file]
+        return [line.rstrip() for line in self.__file if line.rstrip()]
         
     # Saves from list to file
     def save(self,input_list: list[str]) -> bool:
@@ -40,7 +42,9 @@ class TextFile:
             with self as fh:
                 return fh.save(input_list)
         
-        for item in input_list:
-            self.__file.write(f"{item}\n")
-        
+        if self.__file.closed:
+            pass
+
+        self.__file.write('\n'.join(input_list))
+
         return True

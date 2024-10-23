@@ -70,12 +70,12 @@ def courier_menu_choice():
         case 4:
             delete_courier()
         case 0:
-            with TextFile(relative_path) as fh:
+            with TextFile(relative_path, mode='wt') as fh:
                 fh.save(courier_list)
             return False
         case _:
             print("Please select a valid option\n")
-    with TextFile(relative_path) as fh:
+    with TextFile(relative_path, mode='wt') as fh:
         fh.save(courier_list)
     return True
 
