@@ -103,7 +103,7 @@ def delete_order() -> None:
     user_input = get_input("Please enter the number of the order you would like to delete: ", 'int')
     if not user_input:
         return None
-    elif user_input >= len(order_list) or user_input < 0:
+    elif user_input > len(order_list) or user_input < 0:
         print_buffer()
         print("Invalid input, please select a valid id")
         return None
