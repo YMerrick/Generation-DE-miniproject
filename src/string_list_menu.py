@@ -2,7 +2,7 @@
 from .decorators import menu, get_input, print_buffer, print_buffer_exit
 from .text_file_handler import TextFile
 
-def print_menu(context: str):
+def print_menu(context: str) -> None:
     print(f"1. List all {context}s")
     print(f"2. Add {context}")
     print(f"3. Update existing {context}")
@@ -10,12 +10,12 @@ def print_menu(context: str):
     print(f"0. Return to the main menu")
 
 @print_buffer_exit
-def print_list(input_list: list[str]):
+def print_list(input_list: list[str], **kwargs) -> None:
     for i, element in enumerate(input_list):
-        print(f"{i+1}. {element}")
+        print(f"{i+1}. {element}", **kwargs)
 
 @print_buffer_exit
-def add(input_list: list, context: str):
+def add(input_list: list, context: str) -> None:
     print(f"Enter the new {context}:\n")
     input_list.append(get_input('> '))
     
