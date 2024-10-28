@@ -32,7 +32,7 @@ def address_encoder(address: str) -> str:
     return address.replace(',', '_')
 
 def address_decoder(address: str) -> str:
-    return address.replace('_', ',')
+    return address.replace('|', ',')
 
 @print_buffer_exit
 def update(input_list: list[dict]) -> None:
