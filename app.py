@@ -1,6 +1,5 @@
 from src.decorators import get_input, menu, print_buffer
 from src.orders import order_menu
-from src.string_list_menu import menu_start
 from src.text_file_handler import TextFile
 from src.menu import StringListMenu
 
