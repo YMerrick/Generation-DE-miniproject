@@ -19,7 +19,7 @@ class CSVFile:
         with open(self.filename, 'wt') as file:
             # Implement saving function here
             column_headers = [header for header in input_list[0].keys()]
-            writer = DictWriter(file, fieldnames=column_headers)
+            writer = DictWriter(file, fieldnames=column_headers, lineterminator='\r')
             writer.writeheader()
             writer.writerows(input_list)
             
