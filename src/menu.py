@@ -5,6 +5,11 @@ from .text_file_handler import TextFile
 
 class Menu(ABC):
 
+    def __init__(self,  context: str, file_handler, input_list: list):
+        self.context = context
+        self.file_handler = file_handler
+        self.user_list = input_list
+
     @abstractmethod
     def print_menu(self, context: str):
         print(
@@ -14,6 +19,19 @@ class Menu(ABC):
             f"4. Delete {context}\n"
             f"0. Return to the main menu"
         )
+
+    @print_buffer_exit
+    def get_user_selection(self) -> int:
+        print("0. Exit")
+        self.print_list()
+        print(f"Enter the number of the {self.context}:\n")
+        user_selection = get_input("> ", 'int')
+
+        if user_selection > len(self.user_list) or user_selection < 0:
+            print("Invalid input, please select a valid id")
+            raise IndexError
+        
+        return user_selection
 
     @abstractmethod
     def print_list(self):
@@ -44,9 +62,7 @@ class Menu(ABC):
 class StringListMenu(Menu):
 
     def __init__(self, context, file_handler: TextFile, input_list: list[str]):
-        self.context = context
-        self.file_handler = file_handler
-        self.user_list = input_list
+        super().__init__(context, file_handler, input_list)
     
     def print_menu(self):
         return super().print_menu(self.context)
@@ -60,19 +76,6 @@ class StringListMenu(Menu):
     def get_new_item(self):
         print(f"Enter the new {self.context}:\n")
         return get_input('> ')
-        
-    @print_buffer_exit
-    def get_user_selection(self) -> int:
-        print("0. Exit")
-        self.print_list()
-        print(f"Enter the number of the {self.context}:\n")
-        user_selection = get_input("> ", 'int')
-
-        if user_selection > len(self.user_list) or user_selection < 0:
-            print("Invalid input, please select a valid id")
-            raise IndexError
-        
-        return user_selection
 
     @print_buffer_exit
     def add(self, user_item: str) -> None:
@@ -91,7 +94,8 @@ class StringListMenu(Menu):
     def validate_user_selection(self, user_selection: int, function, *args):
         if user_selection:
             function(user_selection, *args)
-        return True if user_selection else False
+            return True
+        return False
 
     def menu_choice(self) -> bool:
         user_input = get_input("Please enter a number to select your menu choice:\n> ",'int')
@@ -119,24 +123,41 @@ class StringListMenu(Menu):
 
 class CSVListMenu(Menu):
 
-    def __init__(self, context: str, file_handler, input_list: list[dict]):
-        self.context = context
+    def __init__(self, context: str, file_handler, input_list: list[dict], template: dict):
+        super().__init__(context, file_handler, input_list)
+        self.template = template
 
     def print_menu(self):
         return super().print_menu(self.context)
     
+    def clean_key(self, input: str) -> str:
+        return input.replace('_', ' ').capitalize()
+    
+    def print_dict(self, dictionary: dict):
+        for key, item in dictionary.items():
+            print(f"{self.clean_key(key)}: {item}")
+    
     def print_list(self):
-        return super().print_list()
+        for index, element in enumerate(self.user_list):
+            print(f"{index+1}.")
+            self.print_dict(element)
     
     def add(self):
         return super().add()
     
-    def update(self):
+    def address_encoder(address: str) -> str:
+        return address.replace(',', '_')
 
+    def address_decoder(address: str) -> str:
+        return address.replace('|', ',')
+    
+    def update(self, user_selection: int, property_selected: str, updated_property: str):
+        selected_dict = user_selection - 1
+        user_selection[property_selected] = updated_property
         return super().update()
     
-    def delete_element(self):
-        return super().delete_element()
+    def delete_element(self, user_selection: int):
+        print(f"{self.user_list.pop(user_selection - 1)} has been deleted!")
     
     def menu_choice(self):
         return super().menu_choice()
