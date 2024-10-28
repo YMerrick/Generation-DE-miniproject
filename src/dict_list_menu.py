@@ -1,5 +1,5 @@
 from decorators import get_input, menu, print_buffer, print_buffer_exit
-from csv_file_handler import CSVFile
+from file_handler import CSVFile
 
 def print_menu(context: str):
     print(f"1. Print all {context}s")

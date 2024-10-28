@@ -1,9 +1,7 @@
 from src.decorators import get_input, menu, print_buffer
 from src.orders import order_menu
-from src.text_file_handler import TextFile
-from src.csv_file_handler import CSVFile
 from src.menu import StringListMenu, CSVListMenu
-from src.file_handler import MyFileHandler
+from src.file_handler import MyFileHandler, TextFile, CSVFile
 
 # TO DO:
 # Implement order functions
