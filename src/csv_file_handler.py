@@ -1,26 +1,25 @@
 from pathlib import Path
+from csv import DictReader, DictWriter
 
 class CSVFile:
 
-    def __init__(self, filepath: str, **kwargs):
+    def __init__(self, filepath: str):
         self.filename = filepath
-        self.__file = None
-        self.__open_kwargs = kwargs
+
+    def load(self) -> list[dict]:       
+        new_list: list[dict]
+        with open(self.filename, 'rt') as file:
+            # Implement loading function here
+            reader = DictReader(file)
+            new_list = [row for row in reader]
+        return new_list
 
 
-    def __enter__(self):
-        return self
-    
-    def __exit__(self, *args):
-        if self.__file:
-            self.__file.close()
-
-    def __del__(self):
-        if self.__file:
-            self.__file.close()
-
-    def load() -> list[dict]:
-        pass
-
-    def save(input_list: list[dict]) -> None:
-        pass
+    def save(self, input_list: list[dict]) -> None:
+        with open(self.filename, 'wt') as file:
+            # Implement saving function here
+            column_headers = [header for header in input_list[0].keys()]
+            writer = DictWriter(file, fieldnames=column_headers)
+            writer.writeheader()
+            writer.writerows(input_list)
+            
