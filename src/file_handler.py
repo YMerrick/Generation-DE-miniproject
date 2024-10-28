@@ -10,11 +10,11 @@ class MyFileHandler(ABC):
 
     @abstractmethod
     def load() -> list:
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def save() -> bool:
-        pass
+        raise NotImplementedError()
 
 class TextFile(MyFileHandler):
 

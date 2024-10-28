@@ -1,22 +1,20 @@
 from abc import ABC, abstractmethod
 
 from .decorators import get_input, print_buffer, print_buffer_exit
-from .text_file_handler import TextFile
 
 class Menu(ABC):
 
-    def __init__(self,  context: str, file_handler, input_list: list):
+    def __init__(self,  context: str, input_list: list):
+        super().__init__()
         self.context = context
-        self.file_handler = file_handler
         self.user_list = input_list
 
-    @abstractmethod
-    def print_menu(self, context: str):
+    def print_menu(self):
         print(
-            f"1. Print all {context}s\n"
-            f"2. Add {context}\n"
-            f"3. Update existing {context}\n"
-            f"4. Delete {context}\n"
+            f"1. Print all {self.context}s\n"
+            f"2. Add {self.context}\n"
+            f"3. Update existing {self.context}\n"
+            f"4. Delete {self.context}\n"
             f"0. Return to the main menu"
         )
 
@@ -35,25 +33,24 @@ class Menu(ABC):
 
     @abstractmethod
     def print_list(self):
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def add(self):
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def update(self):
-        pass
+        raise NotImplementedError()
         
     @abstractmethod
     def delete_element(self):
-        pass
+        raise NotImplementedError() 
 
     @abstractmethod
     def menu_choice(self):
-        pass
+        raise NotImplementedError()
 
-    @abstractmethod
     def start(self):
         self.print_menu()
         while (value := self.menu_choice()):
@@ -61,11 +58,8 @@ class Menu(ABC):
 
 class StringListMenu(Menu):
 
-    def __init__(self, context, file_handler: TextFile, input_list: list[str]):
-        super().__init__(context, file_handler, input_list)
-    
-    def print_menu(self):
-        return super().print_menu(self.context)
+    def __init__(self, context, input_list: list[str]):
+        super().__init__(context, input_list)
 
     @print_buffer_exit
     def print_list(self, **kwargs) -> None:
@@ -110,25 +104,17 @@ class StringListMenu(Menu):
             case 4:
                 self.validate_user_selection(self.get_user_selection(), self.delete_element)
             case 0:
-                self.file_handler.save(self.user_list)
                 return False
             case _:
                 print("Please select a valid option\n")
 
-        self.file_handler.save(self.user_list)
         return True
-    
-    def start(self):
-        return super().start()
 
 class CSVListMenu(Menu):
 
-    def __init__(self, context: str, file_handler, input_list: list[dict], template: dict):
-        super().__init__(context, file_handler, input_list)
+    def __init__(self, context: str, input_list: list[dict], template: dict):
+        super().__init__(context, input_list)
         self.template = template
-
-    def print_menu(self):
-        return super().print_menu(self.context)
     
     def clean_key(self, input: str) -> str:
         return input.replace('_', ' ').capitalize()
@@ -154,7 +140,6 @@ class CSVListMenu(Menu):
     def update(self, user_selection: int, property_selected: str, updated_property: str):
         selected_dict = user_selection - 1
         user_selection[property_selected] = updated_property
-        return super().update()
     
     def delete_element(self, user_selection: int):
         print(f"{self.user_list.pop(user_selection - 1)} has been deleted!")
@@ -162,5 +147,3 @@ class CSVListMenu(Menu):
     def menu_choice(self):
         return super().menu_choice()
     
-    def start(self):
-        return super().start()
