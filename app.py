@@ -2,6 +2,7 @@ from src.decorators import get_input, menu, print_buffer
 from src.orders import order_menu
 from src.string_list_menu import menu_start
 from src.text_file_handler import TextFile
+from src.menu import StringListMenu
 
 # TO DO:
 # Implement order functions
@@ -12,24 +13,28 @@ from src.text_file_handler import TextFile
 
 prod_handler = TextFile('data/product_list.txt')
 prod_list = prod_handler.load()
+prod_menu = StringListMenu('product', prod_handler, prod_list)
 
 cour_handler = TextFile('data/courier_list.txt')
 cour_list = cour_handler.load()
+courier_menu = StringListMenu('courier', cour_handler, cour_list)
 
 def print_main_menu():
-    print("1. Products Menu")
-    print("2. Courier Menu")
-    print("3. Orders Menu")
-    print("0. Exit")
+    print(
+        "1. Products Menu\n" 
+        "2. Courier Menu\n" 
+        "3. Orders Menu\n" 
+        "0. Exit"
+    )
 
 def main_menu_choice() -> bool:
     user_input = get_input("Please enter a number to select your menu choice: ",'int')
     print_buffer()
     match user_input:
         case 1:
-            menu_start('product', prod_handler, prod_list)
+            prod_menu.start()
         case 2:
-            menu_start('courier', cour_handler, cour_list)
+            courier_menu.start()
         case 3:
             order_menu()
         case 0:
