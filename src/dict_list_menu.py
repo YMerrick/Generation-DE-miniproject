@@ -24,10 +24,8 @@ def print_list(input_list: list[dict]) -> None:
 @print_buffer_exit
 def add(input_list: list[dict], template: dict) -> None:
     new_dict = {}
-    new_dict['customer_name'] = get_input("Please enter your customer's name:\n> ")
-    new_dict['customer_phone'] = get_input("Please enter your customer's phone number:\n> ")
-    new_dict['customer_address'] = get_input("Please enter your customer's address:\n> ")
-    new_dict['status'] = 'preparing'
+    for key in template:
+        new_dict[key] = get_input(f"Please enter your {clean_key(key)}:\n> ")
     input_list.append(new_dict)
 
 def address_encoder(address: str) -> str:
