@@ -1,7 +1,9 @@
 from src.decorators import get_input, menu, print_buffer
 from src.orders import order_menu
 from src.text_file_handler import TextFile
-from src.menu import StringListMenu
+from src.csv_file_handler import CSVFile
+from src.menu import StringListMenu, CSVListMenu
+from src.file_handler import MyFileHandler
 
 # TO DO:
 # Implement order functions
@@ -12,11 +14,34 @@ from src.menu import StringListMenu
 
 prod_handler = TextFile('data/product_list.txt')
 prod_list = prod_handler.load()
-prod_menu = StringListMenu('product', prod_handler, prod_list)
+prod_menu = StringListMenu('product', prod_list)
 
 cour_handler = TextFile('data/courier_list.txt')
 cour_list = cour_handler.load()
-courier_menu = StringListMenu('courier', cour_handler, cour_list)
+courier_menu = StringListMenu('courier', cour_list)
+
+order_handler = CSVFile('data/order_list.csv')
+order_list = order_handler.load()
+order_template = CSVFile('data/order_template.csv').load()[0]
+ord_menu = CSVListMenu('order', order_list, order_template)
+
+handler_list = [
+    prod_handler, 
+    cour_handler, 
+    order_handler,
+    ]
+
+all_list = [
+    prod_list, 
+    cour_list, 
+    order_list,
+    ]
+
+def save(handler: MyFileHandler, input_list: list):
+    return handler.save(input_list)
+
+def save_all():
+    return all(map(save, handler_list, all_list))
 
 def print_main_menu():
     print(
@@ -37,6 +62,7 @@ def main_menu_choice() -> bool:
         case 3:
             order_menu()
         case 0:
+            save_all()
             return False
         case _:
             print("Please select a valid option\n")
