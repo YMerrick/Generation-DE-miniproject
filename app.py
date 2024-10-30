@@ -1,5 +1,4 @@
 from src.decorators import get_input, menu, print_buffer
-from src.orders import order_menu
 from src.menu import StringListMenu, CSVListMenu
 from src.file_handler import MyFileHandler, TextFile, CSVFile
 
@@ -58,7 +57,7 @@ def main_menu_choice() -> bool:
         case 2:
             courier_menu.start()
         case 3:
-            order_menu()
+            ord_menu.start()
         case 0:
             save_all()
             return False
