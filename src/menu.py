@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 from .decorators import get_input, print_buffer, print_buffer_exit
 
@@ -18,9 +19,11 @@ class Menu(ABC):
             f"0. Return to the main menu"
         )
     
-    def validate_user_selection(self, user_selection: int, function, *args):
+    def validate_user_selection(self, user_selection: int, function: Callable, *args: Callable):
+        # Implicitly running other functions when not 0
+        # *args are callables
         if user_selection:
-            function(user_selection, *args)
+            function(user_selection, *[function() for function in args])
             return True
         return False
 
@@ -100,7 +103,7 @@ class StringListMenu(Menu):
             case 2:
                 self.add(self.get_new_item())
             case 3:
-                self.validate_user_selection(self.get_user_selection(), self.update, self.get_new_item())
+                self.validate_user_selection(self.get_user_selection(), self.update, self.get_new_item)
             case 4:
                 self.validate_user_selection(self.get_user_selection(), self.delete_element)
             case 0:
@@ -113,10 +116,13 @@ class StringListMenu(Menu):
 class CSVListMenu(Menu):
 
     def __init__(self, context: str, input_list: list[dict], template: dict = None):
+        if len(input_list) < 1 and template is None:
+            raise ValueError("List is empty or template not passed")
+        
         super().__init__(context, input_list)
         if template is None:
             # Make the template
-            self.template = None
+            self.template = input_list[0]
         else:
             self.template = template
     
@@ -124,14 +130,15 @@ class CSVListMenu(Menu):
         return input.replace('_', ' ').capitalize()
     
     def print_dict(self, dictionary: dict):
-        for key, item in dictionary.items():
+        for key, value in dictionary.items():
             match key:
                 case key if 'address' in key:
-                    print(f"{self.clean_key(key): {self.address_decoder(item)}}")
+                    print(f"{self.clean_key(key)}: {self.address_decoder(value)}")
                 case _:
-                    print(f"{self.clean_key(key)}: {item}")
+                    print(f"{self.clean_key(key)}: {value}")
 
-    def print_list(self):
+    @print_buffer_exit
+    def print_list(self,):
         for index, element in enumerate(self.user_list):
             print(f"{index+1}.")
             self.print_dict(element)
@@ -149,20 +156,20 @@ class CSVListMenu(Menu):
                     break
         self.user_list.append(new_dict)
     
-    def address_encoder(address: str) -> str:
+    def address_encoder(self, address: str) -> str:
         return address.replace(',', '|')
 
-    def address_decoder(address: str) -> str:
+    def address_decoder(self, address: str) -> str:
         return address.replace('|', ',')
     
     def get_property(self,):
         key_match = get_input("Enter which property you would like to select:\n> ")
-        while not any(filter(lambda key: key_match.lower() in key, self.template.keys())):
+        while not (keys := list(filter(lambda key: key_match.lower() in key, self.template.keys()))):
             key_match = get_input("Enter which property you would like to select:\n> ")
-        return key_match
+        return keys[0]
     
-    def get_new_property_value(self, property_context):
-        print(f"Enter new {property_context}:\n")
+    def get_new_property_value(self):
+        print(f"Enter new the new property:\n")
         return get_input("> ")
     
     def update(self, user_selection: int, property_selected: str, updated_property: str):
@@ -186,10 +193,9 @@ class CSVListMenu(Menu):
                 self.validate_user_selection(
                     self.get_user_selection(), 
                     self.update, 
-                    self.get_property(),
-                    self.get_new_property_value()
+                    self.get_property,
+                    self.get_new_property_value
                     )
-                self.update()
             case 4:
                 self.validate_user_selection(
                     self.get_user_selection(), 
