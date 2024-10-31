@@ -132,8 +132,7 @@ class CSVListMenu(Menu):
     def print_dict(self, dictionary: dict):
         for key, value in dictionary.items():
             match key:
-                case key if 'address' in key:
-                    print(f"{self.clean_key(key)}: {self.address_decoder(value)}")
+                # case key if 'address' in key:
                 case _:
                     print(f"{self.clean_key(key)}: {value}")
 
@@ -142,25 +141,13 @@ class CSVListMenu(Menu):
         for index, element in enumerate(self.user_list):
             print(f"{index+1}.")
             self.print_dict(element)
+            print()
     
     def add(self,):
         new_dict = {}
         for key in self.template:
             new_dict[key] = get_input(f"Please enter your {self.clean_key(key)}:\n> ")
-        if any(filter(lambda key: 'address' in key, new_dict.keys())):
-            # This does not work
-            # Find property and then update it
-            for _property in new_dict:
-                if 'address' in _property:
-                    new_dict[_property] = self.address_encoder(new_dict[_property])
-                    break
         self.user_list.append(new_dict)
-    
-    def address_encoder(self, address: str) -> str:
-        return address.replace(',', '|')
-
-    def address_decoder(self, address: str) -> str:
-        return address.replace('|', ',')
     
     def get_property(self,):
         key_match = get_input("Enter which property you would like to select:\n> ")
@@ -202,7 +189,6 @@ class CSVListMenu(Menu):
                     self.delete_element
                     )
             case 0:
-                # Apply encoder to all addresses
                 return False
             case _:
                 print("Please select a valid option")
