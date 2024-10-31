@@ -2,12 +2,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from csv import DictReader, DictWriter
 
-class MyFileHandler(ABC):
-    
-    def __init__(self, filepath):
-        super().__init__()
-        self.filename = filepath
-
+class DataHandler(ABC):
+   
     @abstractmethod
     def load() -> list:
         raise NotImplementedError()
@@ -15,6 +11,12 @@ class MyFileHandler(ABC):
     @abstractmethod
     def save() -> bool:
         raise NotImplementedError()
+
+class MyFileHandler(DataHandler):
+    
+    def __init__(self, filepath):
+        super().__init__()
+        self.filename = filepath
 
 class TextFile(MyFileHandler):
 
