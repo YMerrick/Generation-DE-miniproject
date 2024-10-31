@@ -1,19 +1,20 @@
 from src import get_input, print_buffer, menu_loop, StringListMenu, CSVListMenu, MyFileHandler, TextFile, CSVFile
 
 # TO DO:
-# Implement order functions
 # use loom
 # 
 
 # PRINT main menu options GET user input for main menu option
 
-prod_handler = TextFile('data/product_list.txt')
+prod_handler = CSVFile('data/product_list.csv')
 prod_list = prod_handler.load()
-prod_menu = StringListMenu('product', prod_list)
+prod_template = CSVFile('data/product_template.csv').load()[0]
+prod_menu = CSVListMenu('product', prod_list, prod_template)
 
-cour_handler = TextFile('data/courier_list.txt')
+cour_handler = CSVFile('data/courier_list.csv')
 cour_list = cour_handler.load()
-courier_menu = StringListMenu('courier', cour_list)
+cour_template = CSVFile('data/courier_template.csv').load()[0]
+courier_menu = CSVListMenu('courier', cour_list, cour_template)
 
 order_handler = CSVFile('data/order_list.csv')
 order_list = order_handler.load()
