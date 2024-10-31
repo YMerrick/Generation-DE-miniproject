@@ -29,7 +29,7 @@ def print_buffer() -> None:
     star_line = "*" * 60
     print(f"\n{star_line}\n")
 
-def menu(func):
+def menu_loop(func):
     '''Requires functions decorate to return a truthy value'''
     @wraps(func)
     def wrapper_menu(*args, **kwargs):
