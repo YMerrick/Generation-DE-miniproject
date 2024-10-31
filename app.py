@@ -1,6 +1,4 @@
-from src.decorators import get_input, menu, print_buffer
-from src.menu import StringListMenu, CSVListMenu
-from src.file_handler import MyFileHandler, TextFile, CSVFile
+from src import get_input, print_buffer, menu_loop, StringListMenu, CSVListMenu, MyFileHandler, TextFile, CSVFile
 
 # TO DO:
 # Implement order functions
@@ -65,7 +63,7 @@ def main_menu_choice() -> bool:
             print("Please select a valid option\n")
     return True
 
-@menu
+@menu_loop
 def main():
     print_main_menu()
     return main_menu_choice()
