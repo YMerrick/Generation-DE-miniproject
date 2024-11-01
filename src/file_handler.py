@@ -100,3 +100,11 @@ class CSVFile(MyFileHandler):
             writer.writerows(input_list)
 
         return True
+    
+    def get_headers(self) -> list[str]:
+        header_list: list[str]
+        with open(self.filename, 'rt') as file:
+            header_row = file.readline()
+            header_list = [header.rstrip() for header in header_row.split(',')]
+        
+        return header_list

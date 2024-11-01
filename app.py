@@ -1,4 +1,4 @@
-from src import get_input, print_buffer, menu_loop, StringListMenu, CSVListMenu, MyFileHandler, TextFile, CSVFile
+from src import get_input, print_buffer, menu_loop, CSVListMenu, MyFileHandler, CSVFile
 
 # TO DO:
 # use loom
@@ -8,17 +8,17 @@ from src import get_input, print_buffer, menu_loop, StringListMenu, CSVListMenu,
 
 prod_handler = CSVFile('data/product_list.csv')
 prod_list = prod_handler.load()
-prod_template = CSVFile('data/product_template.csv').load()[0]
+prod_template = dict.fromkeys(prod_handler.get_headers())
 prod_menu = CSVListMenu('product', prod_list, prod_template)
 
 cour_handler = CSVFile('data/courier_list.csv')
 cour_list = cour_handler.load()
-cour_template = CSVFile('data/courier_template.csv').load()[0]
+cour_template = dict.fromkeys(cour_handler.get_headers())
 courier_menu = CSVListMenu('courier', cour_list, cour_template)
 
 order_handler = CSVFile('data/order_list.csv')
 order_list = order_handler.load()
-order_template = CSVFile('data/order_template.csv').load()[0]
+order_template = dict.fromkeys(order_handler.get_headers())
 ord_menu = CSVListMenu('order', order_list, order_template)
 
 handler_list = [
