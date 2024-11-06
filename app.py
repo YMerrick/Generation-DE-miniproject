@@ -7,19 +7,19 @@ from src import get_input, print_buffer, menu_loop, CSVListMenu, MyFileHandler, 
 # PRINT main menu options GET user input for main menu option
 
 prod_handler = CSVFile('data/product_list.csv')
-prod_list = prod_handler.load()
+prod_data = DictDataManager(prod_handler.load())
 prod_template = dict.fromkeys(prod_handler.get_headers())
-prod_menu = CSVListMenu('product', prod_list, prod_template)
+prod_menu = CSVListMenu('product', prod_data, prod_template)
 
 cour_handler = CSVFile('data/courier_list.csv')
-cour_list = cour_handler.load()
+cour_data = DictDataManager(cour_handler.load())
 cour_template = dict.fromkeys(cour_handler.get_headers())
-courier_menu = CSVListMenu('courier', cour_list, cour_template)
+courier_menu = CSVListMenu('courier', cour_data, cour_template)
 
 order_handler = CSVFile('data/order_list.csv')
-order_list = order_handler.load()
+order_data = DictDataManager(order_handler.load())
 order_template = dict.fromkeys(order_handler.get_headers())
-ord_menu = CSVListMenu('order', order_list, order_template)
+ord_menu = CSVListMenu('order', order_data, order_template)
 
 handler_list = [
     prod_handler, 
@@ -28,13 +28,13 @@ handler_list = [
     ]
 
 all_list = [
-    prod_list, 
-    cour_list, 
-    order_list,
+    prod_data, 
+    cour_data, 
+    order_data,
     ]
 
-def save(handler: MyFileHandler, input_list: list):
-    return handler.save(input_list)
+def save(handler: MyFileHandler, input_list: DictDataManager):
+    return handler.save(input_list.get_data())
 
 def save_all():
     return all(map(save, handler_list, all_list))

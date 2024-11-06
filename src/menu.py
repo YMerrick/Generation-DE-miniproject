@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Callable
 
-from .decorators import get_input, print_buffer, print_buffer_exit
+from src import get_input, print_buffer, print_buffer_exit
+from src import DataManagerInterface, DictDataManager, StrListDataManager
 
 class Menu(ABC):
 
-    def __init__(self,  context: str, input_list: list):
+    def __init__(self,  context: str, input_data: DataManagerInterface):
         super().__init__()
         self.context = context
-        self.user_list = input_list
+        self.data = input_data
 
     def print_menu(self):
         print(
@@ -22,10 +23,13 @@ class Menu(ABC):
     def validate_user_selection(self, user_selection: int, function: Callable, *args: Callable):
         # Implicitly running other functions when not 0
         # *args are callables
-        if user_selection:
-            function(user_selection, *[function() for function in args])
-            return True
-        return False
+        if user_selection > self.data.get_length() or user_selection < 0:
+            return False
+        if not user_selection:
+            return False
+        
+        function(user_selection, *[function() for function in args])
+        return True
 
     @print_buffer_exit
     def get_user_selection(self) -> int:
@@ -34,27 +38,15 @@ class Menu(ABC):
         print(f"Enter the number of the {self.context}:\n")
         user_selection = get_input("> ", 'int')
 
-        if user_selection > len(self.user_list) or user_selection < 0:
+        if user_selection > self.data.get_length() or user_selection < 0:
             print("Invalid input, please select a valid id")
-            raise IndexError
+
         
         return user_selection
 
     @abstractmethod
     def print_list(self):
         raise NotImplementedError()
-
-    @abstractmethod
-    def add(self):
-        raise NotImplementedError()
-
-    @abstractmethod
-    def update(self):
-        raise NotImplementedError()
-        
-    @abstractmethod
-    def delete_element(self):
-        raise NotImplementedError() 
 
     @abstractmethod
     def menu_choice(self):
@@ -67,12 +59,12 @@ class Menu(ABC):
 
 class StringListMenu(Menu):
 
-    def __init__(self, context, input_list: list[str]):
-        super().__init__(context, input_list)
+    def __init__(self, context, input_data: StrListDataManager):
+        super().__init__(context, input_data)
 
     @print_buffer_exit
     def print_list(self, **kwargs) -> None:
-        for i, element in enumerate(self.user_list):
+        for i, element in enumerate(self.data.get_data()):
             print(f"{i+1}. {element}", **kwargs)
         
     @print_buffer_exit
@@ -82,17 +74,17 @@ class StringListMenu(Menu):
 
     @print_buffer_exit
     def add(self, user_item: str) -> None:
-        self.user_list.append(user_item)
+        self.data.add(user_item)
         print(f"{user_item} has been added!")
     
     @print_buffer_exit
     def update(self, user_selection: int, updated_item: str) -> None:
-        self.user_list[user_selection - 1] = updated_item
+        self.data.update(user_selection, updated_item)
         print("The listing has been updated")
 
     @print_buffer_exit
     def delete_element(self, user_selection: int) -> None:
-        print(f"{self.user_list.pop(user_selection - 1)} has been deleted!")
+        print(f"{self.data.delete_element(user_selection)} has been deleted!")
 
     def menu_choice(self) -> bool:
         user_input = get_input("Please enter a number to select your menu choice:\n> ",'int')
@@ -115,14 +107,14 @@ class StringListMenu(Menu):
 
 class CSVListMenu(Menu):
 
-    def __init__(self, context: str, input_list: list[dict], template: dict = None):
-        if len(input_list) < 1 and template is None:
+    def __init__(self, context: str, input_list: DictDataManager, template: dict = None):
+        if input_list.get_length() < 1 and template is None:
             raise ValueError("List is empty or template not passed")
         
         super().__init__(context, input_list)
         if template is None:
             # Make the template
-            self.template = input_list[0]
+            self.template = dict.fromkeys(input_list.get_keys())
         else:
             self.template = template
     
@@ -137,17 +129,17 @@ class CSVListMenu(Menu):
                     print(f"{self.clean_key(key)}: {value}")
 
     @print_buffer_exit
-    def print_list(self,):
-        for index, element in enumerate(self.user_list):
+    def print_list(self):
+        for index, element in enumerate(self.data.get_data()):
             print(f"{index+1}.")
             self.print_dict(element)
             print()
     
-    def add(self,):
+    def add(self):
         new_dict = {}
         for key in self.template:
             new_dict[key] = get_input(f"Please enter your {self.clean_key(key)}:\n> ")
-        self.user_list.append(new_dict)
+        self.data.add(new_dict)
     
     def get_property(self,):
         key_match = get_input("Enter which property you would like to select:\n> ")
@@ -160,11 +152,11 @@ class CSVListMenu(Menu):
         return get_input("> ")
     
     def update(self, user_selection: int, property_selected: str, updated_property: str):
-        selected_dict = self.user_list[user_selection - 1]
-        selected_dict[property_selected] = updated_property
+        update_dict = self.data.update(user_selection, property_selected, updated_property)
+        # Print updated dictionary
     
-    def delete_element(self, user_selection: int):
-        removed_element = self.user_list.pop(user_selection - 1)
+    def delete(self, user_selection: int):
+        removed_element = self.data.delete_element(user_selection - 1)
         self.print_dict(removed_element)
         print(f"\nHas been deleted!")
     
@@ -186,7 +178,7 @@ class CSVListMenu(Menu):
             case 4:
                 self.validate_user_selection(
                     self.get_user_selection(), 
-                    self.delete_element
+                    self.delete
                     )
             case 0:
                 return False
