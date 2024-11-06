@@ -77,6 +77,9 @@ class CSVFile(MyFileHandler):
         super().__init__(filepath)
 
     def load(self) -> list[dict]:       
+        '''This takes the file and returns a list of dictionaries
+        
+        the keys are the headers and the value is the data'''
         new_list: list[dict]
         with open(self.filename, 'rt') as file:
             # Implement loading function here
