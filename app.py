@@ -41,7 +41,7 @@ handler_list = [
     order_handler,
     ]
 
-all_list = [
+data_list = [
     prod_data, 
     cour_data, 
     order_data,
@@ -50,8 +50,8 @@ all_list = [
 def save(handler: MyFileHandler, input_list: DictDataManager):
     return handler.save(input_list.get_data())
 
-def save_all():
-    return all(map(save, handler_list, all_list))
+def save_all(handler_list: list[MyFileHandler], data_list: list[DictDataManager]):
+    return all(map(save, handler_list, data_list))
 
 def print_main_menu():
     print(
@@ -72,7 +72,7 @@ def main_menu_choice() -> bool:
         case 3:
             ord_menu.start()
         case 0:
-            save_all()
+            save_all(handler_list, data_list)
             return False
         case _:
             print("Please select a valid option\n")
