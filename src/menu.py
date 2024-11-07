@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Callable
 
-from src import get_input, print_buffer, print_buffer_exit
-from src import DataManagerInterface, DictDataManager, StrListDataManager
+from .decorators import get_input, print_buffer, print_buffer_exit
+from .data_manager import DataManagerInterface, DictDataManager, StrListDataManager
 
 class Menu(ABC):
 
@@ -33,8 +33,6 @@ class Menu(ABC):
 
     @print_buffer_exit
     def get_user_selection(self) -> int:
-        print("0. Exit")
-        self.print_list()
         print(f"Enter the number of the {self.context}:\n")
         user_selection = get_input("> ", 'int')
 
@@ -107,20 +105,20 @@ class StringListMenu(Menu):
 
 class CSVListMenu(Menu):
 
-    def __init__(self, context: str, input_list: DictDataManager, template: dict = None):
-        if input_list.get_length() < 1 and template is None:
+    def __init__(self, context: str, data: DictDataManager, template: dict = None):
+        if data.get_length() < 1 and template is None:
             raise ValueError("List is empty or template not passed")
         
-        super().__init__(context, input_list)
+        super().__init__(context, data)
         if template is None:
             # Make the template
-            self.template = dict.fromkeys(input_list.get_keys())
+            self.template = dict.fromkeys(data.get_keys())
         else:
             self.template = template
-    
+
     def clean_key(self, input: str) -> str:
         return input.replace('_', ' ').capitalize()
-    
+
     def print_dict(self, dictionary: dict):
         for key, value in dictionary.items():
             match key:
@@ -134,41 +132,49 @@ class CSVListMenu(Menu):
             print(f"{index+1}.")
             self.print_dict(element)
             print()
+
+    @print_buffer_exit
+    def print_table(self):
+        print(self.data)
     
     def add(self):
         new_dict = {}
         for key in self.template:
             new_dict[key] = get_input(f"Please enter your {self.clean_key(key)}:\n> ")
         self.data.add(new_dict)
-    
+
     def get_property(self,):
-        key_match = get_input("Enter which property you would like to select:\n> ")
+        print("Enter which property you would like to select:\n ")
+        key_match = get_input("> ")
         while not (keys := list(filter(lambda key: key_match.lower() in key, self.template.keys()))):
             key_match = get_input("Enter which property you would like to select:\n> ")
         return keys[0]
-    
+
     def get_new_property_value(self):
-        print(f"Enter new the new property:\n")
+        print(f"\nEnter new the new property:\n")
         return get_input("> ")
-    
+
     def update(self, user_selection: int, property_selected: str, updated_property: str):
         update_dict = self.data.update(user_selection, property_selected, updated_property)
         # Print updated dictionary
-    
+
     def delete(self, user_selection: int):
         removed_element = self.data.delete_element(user_selection - 1)
         self.print_dict(removed_element)
         print(f"\nHas been deleted!")
-    
+
     def menu_choice(self):
-        user_input = get_input("Please enter a number to select your menu choice:\n> ",'int')
+        print("\nPlease enter a number to select your menu choice:\n")
+        user_input = get_input("> ",'int')
         print_buffer()
         match user_input:
             case 1:
-                self.print_list()
+                self.print_table()
             case 2:
                 self.add()
             case 3:
+                self.print_table()
+                print(f"Enter 0 to EXIT\n")
                 self.validate_user_selection(
                     self.get_user_selection(), 
                     self.update, 
@@ -176,6 +182,8 @@ class CSVListMenu(Menu):
                     self.get_new_property_value
                     )
             case 4:
+                self.print_table()
+                print(f"Enter 0 to EXIT\n")
                 self.validate_user_selection(
                     self.get_user_selection(), 
                     self.delete
@@ -187,4 +195,3 @@ class CSVListMenu(Menu):
                 print_buffer()
 
         return True
-    

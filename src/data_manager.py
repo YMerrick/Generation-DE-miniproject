@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
+from tabulate import tabulate
+
 class DataManagerInterface(ABC):
 
     @abstractmethod
@@ -40,6 +42,14 @@ class DictDataManager(DataManagerInterface):
             super().__init__()
             self.user_list = input_list
 
+    def __str__(self):
+        return tabulate(self.user_list, 
+                        headers= {k: k.replace('_',' ').capitalize() for k in self.get_keys()}, 
+                        showindex=(index + 1 for index in range(self.get_length())),
+                        floatfmt='.2f',
+                        tablefmt='rounded_grid'
+                        )
+
     def add(self, new_dict):
         self.user_list.append(new_dict)
 
@@ -51,7 +61,7 @@ class DictDataManager(DataManagerInterface):
     def delete_element(self, user_selection: int) -> dict:
         return self.user_list.pop(user_selection)
 
-    def get_keys(self) -> Iterable | None:
+    def get_keys(self) -> list[str] | None:
         if self.user_list:
             return list(self.user_list[0].keys())
         return None
