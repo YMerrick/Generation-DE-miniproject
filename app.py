@@ -47,6 +47,12 @@ data_list = [
     order_data,
     ]
 
+menu_list = [
+    prod_menu,
+    courier_menu,
+    ord_menu
+]
+
 def save(handler: MyFileHandler, input_list: DictDataManager):
     return handler.save(input_list.get_data())
 
@@ -61,16 +67,13 @@ def print_main_menu():
         "0. Exit"
     )
 
-def main_menu_choice() -> bool:
-    user_input = get_input("Please enter a number to select your menu choice: ",'int')
+def main_menu_choice(menu_list: list[CSVListMenu], handler_list: list[MyFileHandler], data_list: list[DictDataManager]) -> bool:
+    print("\nPlease enter a number to select your menu choice:\n")
+    user_input = get_input("> ",'int')
     print_buffer()
     match user_input:
-        case 1:
-            prod_menu.start()
-        case 2:
-            courier_menu.start()
-        case 3:
-            ord_menu.start()
+        case choice if 0 < choice <= len(menu_list):
+            menu_list[choice - 1].start()
         case 0:
             save_all(handler_list, data_list)
             return False
@@ -79,9 +82,9 @@ def main_menu_choice() -> bool:
     return True
 
 @menu_loop
-def main():
+def main(menu_list, handler_list: list[MyFileHandler], data_list: list[DictDataManager]):
     print_main_menu()
-    return main_menu_choice()
+    return main_menu_choice(menu_list, handler_list, data_list)
 
 # IF user input is 0: EXIT app
 
@@ -89,4 +92,4 @@ if __name__ == "__main__":
     print_buffer()
     print("Welcome to York's Fromage Frenzy")
     print_buffer()
-    main()
+    main(menu_list, handler_list, data_list)
