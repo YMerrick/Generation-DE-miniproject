@@ -104,29 +104,3 @@ def test_DataHandler():
     
     with pytest.raises(NotImplementedError):
         result.load()
-
-
-# def test_write_and_read(file_handler):
-#     content = "Hello, World!"
-#     file_handler.write(content)
-    
-#     result = file_handler.read()
-#     assert result == content
-
-# def test_append(file_handler):
-#     initial_content = "Hello"
-#     append_content = ", World!"
-    
-#     file_handler.write(initial_content)  # Write initial content
-#     file_handler.append(append_content)   # Append new content
-    
-#     result = file_handler.read()
-#     expected_result = initial_content + append_content
-#     assert result == expected_result
-
-# def test_delete(file_handler):
-#     content = "This will be deleted."
-#     file_handler.write(content)  # Write some content
-#     file_handler.delete()         # Delete the file
-    
-#     assert not os.path.exists(file_handler.file_path)
