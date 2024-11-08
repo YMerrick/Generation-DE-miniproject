@@ -143,7 +143,7 @@ class CSVListMenu(Menu):
             keys = data[0].keys()
         tabular_form = tabulate(data,
                                 headers= {k: self.clean_key(k) for k in keys}, 
-                                showindex=(index + 1 for index in range(self.data.get_length())),
+                                showindex= range(1, len(data)+1),
                                 floatfmt='.2f',
                                 tablefmt='rounded_grid',
                                 )
@@ -152,7 +152,11 @@ class CSVListMenu(Menu):
     def add(self):
         new_dict = {}
         for key in self.template:
-            new_dict[key] = get_input(f"Please enter your {self.clean_key(key)}:\n> ")
+            match key.lower():
+                case 'status':
+                    new_dict[key] = 'preparing'
+                case _:
+                    new_dict[key] = get_input(f"Please enter your {self.clean_key(key)}:\n> ")
         self.data.add(new_dict)
 
     def get_property(self,) -> str:
@@ -171,7 +175,7 @@ class CSVListMenu(Menu):
         self.print_table([update_dict])
 
     def delete(self, user_selection: int):
-        removed_element = self.data.delete_element(user_selection - 1)
+        removed_element = self.data.delete_element(user_selection)
         self.print_table([removed_element])
         print(f"The above entry been DELETED!\n")
 

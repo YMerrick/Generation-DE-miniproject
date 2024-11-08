@@ -27,8 +27,8 @@ class StrListDataManager(DataManagerInterface):
         return self.user_list
 
     def update(self, index, new_input):
-        self.user_list[index] = new_input
-        return self.user_list[index]
+        self.user_list[index - 1] = new_input
+        return self.user_list[index - 1]
 
     def delete_element(self, index):
         return self.user_list.pop(index - 1)
@@ -78,7 +78,7 @@ class DictDataManager(DataManagerInterface):
         return selected_dict
 
     def delete_element(self, user_selection: int) -> dict:
-        return self.user_list.pop(user_selection)
+        return self.user_list.pop(user_selection - 1)
 
     def get_keys(self) -> list[str] | None:
         if self.user_list:
