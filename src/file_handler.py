@@ -6,11 +6,11 @@ from typing import IO
 class DataHandler(ABC):
    
     @abstractmethod
-    def load() -> list:
+    def load(self) -> list:
         raise NotImplementedError()
 
     @abstractmethod
-    def save() -> bool:
+    def save(self) -> bool:
         raise NotImplementedError()
 
 class MyFileHandler(DataHandler):
