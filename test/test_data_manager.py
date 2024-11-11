@@ -18,10 +18,6 @@ def dict_stub_data():
         ]
 
 @pytest.fixture(scope='module')
-def str_data_manager(string_stub_data):
-    return StrListDataManager(string_stub_data)
-
-@pytest.fixture(scope='module')
 def dict_data_manager(dict_stub_data):
     return DictDataManager(dict_stub_data)
 
