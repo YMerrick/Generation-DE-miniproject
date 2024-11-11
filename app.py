@@ -81,7 +81,6 @@ def main_menu_choice(menu_list: list[CSVListMenu], handler_list: list[MyFileHand
             print("Please select a valid option\n")
     return True
 
-@menu_loop
 def main(menu_list, handler_list: list[MyFileHandler], data_list: list[DictDataManager]):
     print_main_menu()
     return main_menu_choice(menu_list, handler_list, data_list)
@@ -92,4 +91,5 @@ if __name__ == "__main__":
     print_buffer()
     print("Welcome to York's Fromage Frenzy")
     print_buffer()
-    main(menu_list, handler_list, data_list)
+    while rerun := main(menu_list, handler_list, data_list):
+        pass
