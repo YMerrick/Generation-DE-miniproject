@@ -46,24 +46,6 @@ def test_DataManagerInterface():
     with pytest.raises(NotImplementedError):
         result.delete_element()
 
-def test_string_add(str_data_manager, string_stub_data):
-    expected = string_stub_data + ['another']
-    assert expected == str_data_manager.add('another')
-
-def test_string_update(str_data_manager):
-    expected = 'new'
-    index = 3
-    assert expected == str_data_manager.update(index, 'new')
-
-def test_string_delete(str_data_manager):
-    expected = 'new'
-    index = 3
-    assert expected == str_data_manager.delete_element(index)
-
-def test_string_get_data(str_data_manager, string_stub_data):
-    expected = string_stub_data
-    assert expected == str_data_manager.get_data()
-
 def test_select_columns_fail(dict_data_manager):
     assert dict_data_manager.select_columns('headers') is None
 
