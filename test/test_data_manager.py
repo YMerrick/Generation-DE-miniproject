@@ -1,6 +1,6 @@
 import pytest
 
-from src import DataManagerInterface, DictDataManager, StrListDataManager
+from src import DataManagerInterface, DictDataManager
 
 @pytest.fixture(scope='module')
 def string_stub_data():
