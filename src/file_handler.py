@@ -3,8 +3,9 @@ from pathlib import Path
 from csv import DictReader, DictWriter
 from typing import IO
 
+
 class DataHandler(ABC):
-   
+
     @abstractmethod
     def load(self) -> list:
         raise NotImplementedError()
@@ -13,23 +14,28 @@ class DataHandler(ABC):
     def save(self) -> bool:
         raise NotImplementedError()
 
+
 class MyFileHandler(DataHandler):
-    
+
     def __init__(self, filepath: str):
         super().__init__()
         self.filename: str = filepath
-    
+
+
 class CSVFile(MyFileHandler):
 
     def __init__(self, filepath: str):
         super().__init__(filepath)
 
     def open_file(self, **kwargs) -> IO:
-        '''This opens attempts to open and then return a file from the instance attribute'''
+        '''This opens attempts to open and then return a file from the
+        instance attribute'''
         try:
             file = open(self.filename, **kwargs)
         except FileNotFoundError:
-            Path('/'.join(self.filename.split('/')[:-1])).mkdir(parents=True, exist_ok=True)
+            Path('/'.join(
+                self.filename.split('/')[:-1]
+                )).mkdir(parents=True, exist_ok=True)
             Path(self.filename).touch(exist_ok=True)
             file = open(self.filename, **kwargs)
         except Exception:
@@ -37,9 +43,9 @@ class CSVFile(MyFileHandler):
             raise
         return file
 
-    def load(self) -> list[dict]:       
+    def load(self) -> list[dict]:
         '''This takes the file and returns a list of dictionaries
-        
+
         the keys are the headers and the value is the data'''
         new_list: list[dict]
         with self.open_file(mode='rt') as file:
@@ -59,7 +65,9 @@ class CSVFile(MyFileHandler):
                 column_headers = [header for header in template.keys()]
             else:
                 column_headers = [header for header in input_list[0].keys()]
-            writer = DictWriter(file, fieldnames=column_headers, lineterminator='\r')
+            writer = DictWriter(file,
+                                fieldnames=column_headers,
+                                lineterminator='\r')
             writer.writeheader()
             writer.writerows(input_list)
 
@@ -70,5 +78,5 @@ class CSVFile(MyFileHandler):
         with self.open_file(mode='rt') as file:
             header_row = file.readline()
             header_list = [header.rstrip() for header in header_row.split(',')]
-        
+
         return header_list

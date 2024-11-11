@@ -1,5 +1,6 @@
 from functools import wraps
 
+
 def get_num_input(prompt: str) -> int:
     input_flag = True
     while input_flag:
@@ -7,8 +8,9 @@ def get_num_input(prompt: str) -> int:
             input_flag = False
     return int(user_input)
 
-def get_input(prompt:str, input_type: str = 'str'):
-    if input_type not in ['str','int']:
+
+def get_input(prompt: str, input_type: str = 'str'):
+    if input_type not in ['str', 'int']:
         raise TypeError("Please use either 'str' or 'int'")
     match input_type:
         case 'int':
@@ -16,6 +18,7 @@ def get_input(prompt:str, input_type: str = 'str'):
         case 'str':
             user_input = input(prompt)
     return user_input
+
 
 def print_buffer_exit(func):
     @wraps(func)
@@ -25,9 +28,11 @@ def print_buffer_exit(func):
         return value
     return wrapper_buffer
 
+
 def print_buffer() -> None:
     star_line = "*" * 60
     print(f"\n{star_line}\n")
+
 
 def menu_loop(func):
     '''Requires functions decorate to return a truthy value'''
@@ -36,4 +41,4 @@ def menu_loop(func):
         rerun_flag = True
         while rerun_flag:
             rerun_flag = func(*args, **kwargs)
-    return wrapper_menu 
+    return wrapper_menu

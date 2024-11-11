@@ -6,6 +6,7 @@ from tabulate import tabulate
 from .decorators import get_input, print_buffer, print_buffer_exit
 from .data_manager import DataManagerInterface, DictDataManager
 
+
 class Menu(ABC):
 
     def __init__(self,  context: str, input_data: DataManagerInterface):
@@ -21,15 +22,18 @@ class Menu(ABC):
             f"4. Delete {self.context}\n"
             f"0. Return to the main menu"
         )
-    
-    def validate_user_selection(self, user_selection: int, function: Callable, *args: Callable):
+
+    def validate_user_selection(self,
+                                user_selection: int,
+                                function: Callable,
+                                *args: Callable):
         # Implicitly running other functions when not 0
         # *args are callables
         if user_selection > self.data.get_length() or user_selection < 0:
             return False
         if not user_selection:
             return False
-        
+
         function(user_selection, *[function() for function in args])
         return True
 
@@ -41,7 +45,6 @@ class Menu(ABC):
         if user_selection > self.data.get_length() or user_selection < 0:
             print("Invalid input, please select a valid id")
 
-        
         return user_selection
 
     @abstractmethod
@@ -54,15 +57,18 @@ class Menu(ABC):
 
     def start(self):
         self.print_menu()
-        while (value := self.menu_choice()):
+        while self.menu_choice():
             self.print_menu()
+
 
 class CSVListMenu(Menu):
 
-    def __init__(self, context: str, data: DictDataManager, template: dict = None):
+    def __init__(self, context: str,
+                 data: DictDataManager,
+                 template: dict = None):
         if data.get_length() < 1 and template is None:
             raise ValueError("List is empty or template not passed")
-        
+
         super().__init__(context, data)
         if template is None:
             # Make the template
@@ -94,8 +100,8 @@ class CSVListMenu(Menu):
         else:
             keys = data[0].keys()
         tabular_form = tabulate(data,
-                                headers= {k: self.clean_key(k) for k in keys}, 
-                                showindex= range(1, len(data)+1),
+                                headers={k: self.clean_key(k) for k in keys},
+                                showindex=range(1, len(data)+1),
                                 floatfmt='.2f',
                                 tablefmt='rounded_grid',
                                 )
@@ -108,32 +114,44 @@ class CSVListMenu(Menu):
                 case 'status':
                     new_dict[key] = 'preparing'
                 case _:
-                    new_dict[key] = get_input(f"Please enter your {self.clean_key(key)}:\n> ")
+                    new_dict[key] = get_input(
+                        f"Please enter your {self.clean_key(key)}:\n> "
+                        )
         self.data.add(new_dict)
+
+    def list_keys_from_search(self, search_term: str):
+        return list(filter(lambda key: search_term.lower() in key,
+                           self.template.keys()))
 
     def get_property(self,) -> str:
         print("Enter which property you would like to select:\n ")
         key_match = get_input("> ")
-        while not (keys := list(filter(lambda key: key_match.lower() in key, self.template.keys()))):
-            key_match = get_input("Enter which property you would like to select:\n> ")
+        while not (keys := self.list_keys_from_search(key_match)):
+            key_match = get_input(
+                "Enter which property you would like to select:\n> "
+                )
         return keys[0]
 
     def get_new_property_value(self) -> str:
-        print(f"\nEnter new the new property:\n")
+        print("\nEnter new the new property:\n")
         return get_input("> ")
 
-    def update(self, user_selection: int, property_selected: str, updated_property: str):
-        update_dict = self.data.update(user_selection, property_selected, updated_property)
+    def update(self, user_selection: int,
+               property_selected: str,
+               updated_property: str):
+        update_dict = self.data.update(user_selection,
+                                       property_selected,
+                                       updated_property)
         self.print_table([update_dict])
 
     def delete(self, user_selection: int):
         removed_element = self.data.delete_element(user_selection)
         self.print_table([removed_element])
-        print(f"The above entry been DELETED!\n")
+        print("The above entry been DELETED!\n")
 
     def menu_choice(self) -> bool:
         print("\nPlease enter a number to select your menu choice:\n")
-        user_input = get_input("> ",'int')
+        user_input = get_input("> ", 'int')
         print_buffer()
         match user_input:
             case 1:
@@ -142,18 +160,18 @@ class CSVListMenu(Menu):
                 self.add()
             case 3:
                 self.print_table(self.data.get_data())
-                print(f"Enter 0 to EXIT\n")
+                print("Enter 0 to EXIT\n")
                 self.validate_user_selection(
-                    self.get_user_selection(), 
-                    self.update, 
+                    self.get_user_selection(),
+                    self.update,
                     self.get_property,
                     self.get_new_property_value
                     )
             case 4:
                 self.print_table(self.data.get_data())
-                print(f"Enter 0 to EXIT\n")
+                print("Enter 0 to EXIT\n")
                 self.validate_user_selection(
-                    self.get_user_selection(), 
+                    self.get_user_selection(),
                     self.delete
                     )
             case 0:
