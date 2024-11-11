@@ -4,7 +4,7 @@ from typing import Callable
 from tabulate import tabulate
 
 from .decorators import get_input, print_buffer, print_buffer_exit
-from .data_manager import DataManagerInterface, DictDataManager, StrListDataManager
+from .data_manager import DataManagerInterface, DictDataManager
 
 class Menu(ABC):
 
@@ -56,54 +56,6 @@ class Menu(ABC):
         self.print_menu()
         while (value := self.menu_choice()):
             self.print_menu()
-
-class StringListMenu(Menu):
-
-    def __init__(self, context, input_data: StrListDataManager):
-        super().__init__(context, input_data)
-
-    @print_buffer_exit
-    def print_list(self, **kwargs) -> None:
-        for i, element in enumerate(self.data.get_data()):
-            print(f"{i+1}. {element}", **kwargs)
-        
-    @print_buffer_exit
-    def get_new_item(self):
-        print(f"Enter the new {self.context}:\n")
-        return get_input('> ')
-
-    @print_buffer_exit
-    def add(self, user_item: str) -> None:
-        self.data.add(user_item)
-        print(f"{user_item} has been added!")
-    
-    @print_buffer_exit
-    def update(self, user_selection: int, updated_item: str) -> None:
-        self.data.update(user_selection, updated_item)
-        print("The listing has been updated")
-
-    @print_buffer_exit
-    def delete_element(self, user_selection: int) -> None:
-        print(f"{self.data.delete_element(user_selection)} has been deleted!")
-
-    def menu_choice(self) -> bool:
-        user_input = get_input("Please enter a number to select your menu choice:\n> ",'int')
-        print_buffer()
-        match user_input:
-            case 1:
-                self.print_list()
-            case 2:
-                self.add(self.get_new_item())
-            case 3:
-                self.validate_user_selection(self.get_user_selection(), self.update, self.get_new_item)
-            case 4:
-                self.validate_user_selection(self.get_user_selection(), self.delete_element)
-            case 0:
-                return False
-            case _:
-                print("Please select a valid option\n")
-
-        return True
 
 class CSVListMenu(Menu):
 

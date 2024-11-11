@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Iterable
 
 from tabulate import tabulate
 
@@ -16,25 +15,6 @@ class DataManagerInterface(ABC):
     @abstractmethod
     def delete_element(self):
         raise NotImplementedError()
-
-class StrListDataManager(DataManagerInterface):
-    def __init__(self, input_list: list[str]):
-        super().__init__()
-        self.user_list = input_list
-
-    def add(self, new_input):
-        self.user_list.append(new_input)
-        return self.user_list
-
-    def update(self, index, new_input):
-        self.user_list[index - 1] = new_input
-        return self.user_list[index - 1]
-
-    def delete_element(self, index):
-        return self.user_list.pop(index - 1)
-
-    def get_data(self) -> list[str]:
-        return self.user_list
 
 class DictDataManager(DataManagerInterface):
 
