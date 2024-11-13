@@ -1,16 +1,22 @@
 '''CLI application for a cheese mongers.
 
+A command line interface application for a miniproject as part of the 
+Generation: You data engineering bootcamp. The program is navigated through
+inputting indexes of menu options. 
 
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
+Usage:
 
-Typical usage example:
+    $ python run.py
 
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
+TO DO:
+    * persist to database
+    * database to csv
+    *   
 '''
+from os import getenv
+
+from dotenv import load_dotenv
+import psycopg2 as psycopg
 
 from src import get_input, print_buffer, \
     CSVListMenu, MyFileHandler, CSVFile, DictDataManager
@@ -77,15 +83,19 @@ def main_menu_choice(menu_list: list[CSVListMenu],
     return True
 
 
-def main(menu_list, handler_list: list[MyFileHandler],
+def menu(menu_list, handler_list: list[MyFileHandler],
          data_list: list[DictDataManager]):
     print_main_menu()
     return main_menu_choice(menu_list, handler_list, data_list)
 
 
-if __name__ == "__main__":
+def main():
     print_buffer()
     print("Welcome to York's Fromage Frenzy")
     print_buffer()
-    while rerun := main(menu_list, handler_list, data_list):
+    while (rerun := menu(menu_list, handler_list, data_list)):
         pass
+
+
+if __name__ == "__main__":
+    main()
