@@ -1,3 +1,22 @@
+"""File handler class for cheese mongers CLI app.
+
+Class 
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+Usage example:
+
+  foo = CSVFile(filepath)
+  bar = foo.load()
+  foo.save(data_list, template)
+  foobar = foo.get_headers()
+
+TO DO:
+    * Finish module doc string
+    * 
+"""
 from abc import ABC, abstractmethod
 
 from tabulate import tabulate

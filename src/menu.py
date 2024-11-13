@@ -1,3 +1,22 @@
+"""Menu class for cheese mongers CLI app.
+
+Class 
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+Usage example:
+
+  foo = CSVListMenu()
+  foo.start()
+
+TO DO:
+    * Finish module doc string
+    * Finish class doc string
+    * Finish method doc strings
+    * Add better printing options
+"""
 from abc import ABC, abstractmethod
 from typing import Callable
 
@@ -8,8 +27,27 @@ from .data_manager import DataManagerInterface, DictDataManager
 
 
 class Menu(ABC):
+    '''Abstract menu interface.
 
+    This is an interface to be sub-classed and implement all abstract methods.
+    This is also where the start method is described to create a loop for the
+    menu until you exit.
+
+    Atributes:
+        context:
+            A string describing what the menu is for.
+        data:
+            A DataManger instance handling our data
+    '''
     def __init__(self,  context: str, input_data: DataManagerInterface):
+        '''Initialises the instance based on context with data also passed.
+        
+        Args:
+            context (str):
+                A single word description of the data
+            input_data:
+                A DataMangerInterface sub-class instance
+        '''
         super().__init__()
         self.context = context
         self.data = input_data
@@ -27,9 +65,29 @@ class Menu(ABC):
                                 user_selection: int,
                                 function: Callable,
                                 *args: Callable):
-        # Implicitly running other functions when not 0
-        # *args are callables
+        '''Validates user input then runs function with it's params
+        
+        Calls a function after validating user input is within bounds then
+        passes implicity run functions.
+        
+        Args:
+            user_selection:
+                User selection of options provided.
+            function:
+                Main function you want to call.
+            args:
+                List of callables.
+
+        Returns:
+            Returns a truthy value if call was successful or falsy value if
+            user selection is out of bounds or 0.
+
+        Raises:
+            TypeError:
+                An error occurred calling args.
+        '''
         if user_selection > self.data.get_length() or user_selection < 0:
+            print("Invalid input, please select a valid id")
             return False
         if not user_selection:
             return False
@@ -41,9 +99,6 @@ class Menu(ABC):
     def get_user_selection(self) -> int:
         print(f"Enter the number of the {self.context}:\n")
         user_selection = get_input("> ", 'int')
-
-        if user_selection > self.data.get_length() or user_selection < 0:
-            print("Invalid input, please select a valid id")
 
         return user_selection
 
@@ -62,10 +117,20 @@ class Menu(ABC):
 
 
 class CSVListMenu(Menu):
+    '''Menu for list of dictionaries.
 
+    This is an interface to be sub-classed and implement all abstract methods.
+    This is also where the start method is described to create a loop for the
+    menu until you exit.
+
+    Atributes:
+        template:
+
+    '''
     def __init__(self, context: str,
                  data: DictDataManager,
                  template: dict = None):
+        ''''''
         if data.get_length() < 1 and template is None:
             raise ValueError("List is empty or template not passed")
 
@@ -77,6 +142,16 @@ class CSVListMenu(Menu):
             self.template = template
 
     def clean_key(self, input: str) -> str:
+        '''Cleans key for string output
+        
+        Args:
+            input:
+                The string to be modified
+                
+        Returns:
+            A string where underscores are replaced and first letter is
+            capitalised.
+        '''
         return input.replace('_', ' ').capitalize()
 
     def print_dict(self, dictionary: dict):
