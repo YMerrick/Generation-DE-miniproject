@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 from io import StringIO
 
-from app import save, save_all, main_menu_choice, main, print_main_menu
+from src.app import save, save_all, main_menu_choice, menu, print_main_menu
 
 
 @pytest.fixture(scope='module')
@@ -116,11 +116,11 @@ def test_main_menu_choice_exit(monkeypatch, stub_menu_list,
     data_list[0].reset_mock()
 
 
-def test_main(monkeypatch, stub_menu_list, handler_list, data_list):
+def test_menu(monkeypatch, stub_menu_list, handler_list, data_list):
     monkeypatch.setattr('sys.stdin', StringIO('1\n'))
     expected = True
 
-    assert expected == main(stub_menu_list, handler_list, data_list)
+    assert expected == menu(stub_menu_list, handler_list, data_list)
 
     stub_menu_list[0].reset_mock()
     handler_list[0].reset_mock()
