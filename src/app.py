@@ -18,8 +18,10 @@ from os import getenv
 from dotenv import load_dotenv
 import psycopg2 as psycopg
 
-from src import get_input, print_buffer, \
-    CSVListMenu, MyFileHandler, CSVFile, DictDataManager
+from .decorators import get_input, print_buffer
+from .menu import CSVListMenu
+from .data_manager import DictDataManager
+from .file_handler import MyFileHandler, CSVFile
 
 # TO DO:
 # use loom
