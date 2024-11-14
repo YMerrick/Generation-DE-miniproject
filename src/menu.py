@@ -103,7 +103,7 @@ class Menu(ABC):
         return user_selection
 
     @abstractmethod
-    def print_list(self):
+    def print_entries(self):
         raise NotImplementedError()
 
     @abstractmethod
@@ -114,6 +114,52 @@ class Menu(ABC):
         self.print_menu()
         while self.menu_choice():
             self.print_menu()
+
+
+class DBMenu(Menu):
+
+    def __init__(self, context: str,
+                 input_data: DataManagerInterface):
+        super().__init__(context, input_data)
+
+    def print_entries(self):
+        '''Ask user for filters then prints listings'''
+        return super().print_entries()
+    
+    def menu_choice(self) -> bool:
+        print("\nPlease enter a number to select your menu choice:\n")
+        user_input = get_input("> ", 'int')
+        print_buffer()
+        match user_input:
+            case 1:
+                'Gets data then prints it out'
+                self.print_entries()
+            case 2:
+                self.add()
+            case 3:
+                self.print_entries()
+                print("Enter 0 to EXIT\n")
+                self.validate_user_selection(
+                    self.get_user_selection(),
+                    self.update,
+                    self.get_property,
+                    self.get_new_property_value
+                    )
+            case 4:
+                self.print_entries()
+                print("Enter 0 to EXIT\n")
+                self.validate_user_selection(
+                    self.get_user_selection(),
+                    self.delete
+                    )
+            case 0:
+                return False
+            case _:
+                print("Please select a valid option")
+                print_buffer()
+
+        return True
+
 
 
 class CSVListMenu(Menu):
@@ -168,7 +214,6 @@ class CSVListMenu(Menu):
             self.print_dict(element)
             print()
 
-    @print_buffer_exit
     def print_table(self, data: list[dict]):
         if not data:
             keys = self.template.keys()
@@ -181,6 +226,10 @@ class CSVListMenu(Menu):
                                 tablefmt='rounded_grid',
                                 )
         print(tabular_form)
+
+    @print_buffer_exit
+    def print_entries(self):
+        self.print_table(self.data.get_data())
 
     def add(self):
         new_dict = {}
@@ -230,11 +279,11 @@ class CSVListMenu(Menu):
         print_buffer()
         match user_input:
             case 1:
-                self.print_table(self.data.get_data())
+                self.print_entries()
             case 2:
                 self.add()
             case 3:
-                self.print_table(self.data.get_data())
+                self.print_entries()
                 print("Enter 0 to EXIT\n")
                 self.validate_user_selection(
                     self.get_user_selection(),
@@ -243,7 +292,7 @@ class CSVListMenu(Menu):
                     self.get_new_property_value
                     )
             case 4:
-                self.print_table(self.data.get_data())
+                self.print_entries()
                 print("Enter 0 to EXIT\n")
                 self.validate_user_selection(
                     self.get_user_selection(),

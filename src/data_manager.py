@@ -20,6 +20,7 @@ TO DO:
 from abc import ABC, abstractmethod
 
 from tabulate import tabulate
+from psycopg2.extensions import connection, cursor
 
 
 class DataManagerInterface(ABC):
@@ -35,6 +36,37 @@ class DataManagerInterface(ABC):
     @abstractmethod
     def delete_element(self):
         raise NotImplementedError()
+
+
+class DBDatamanager(DataManagerInterface):
+    '''Class used to make and send sql queries to a db connection'''
+    def __init__(self, cur: cursor):
+        super().__init__()
+        self.cur = cur
+
+    def __del__(self):
+        self.cur.close()
+        super().__del__()
+
+    def add(self):
+        '''Adds an entry into a table'''
+        return super().add()
+    
+    def update(self):
+        '''Updates an entry in a table'''
+        return super().update()
+    
+    def delete_element(self):
+        '''Deletes an entry in a table'''
+        return super().delete_element()
+    
+    def get(self):
+        '''Retrieves and entry in a table'''
+        pass
+    
+    def check_exists(self):
+        '''Checks if an entry exists in a table'''
+        pass
 
 
 class DictDataManager(DataManagerInterface):
