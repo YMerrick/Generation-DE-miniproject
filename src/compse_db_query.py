@@ -1,24 +1,24 @@
 from typing import Self
 
-from psycopg2.sql import SQL, Literal, Composable
+from psycopg2.sql import SQL, Composable, Composed
 
 class Composer():
 
     def __init__(self, dml: str):
 
-        match dml.lower():
-            case arg if arg in self._commands:
-                self.dml = self._commands[arg]()
-            case _:
-                # Error somehow or reject statement
-                pass
-
-        self._commands = {
+        self.__commands = {
             'select' : self.__select,
             'insert' : self.__insert,
             'update' : self.__update,
             'delete' : self.__delete
         }
+
+        match dml.lower():
+            case arg if arg in self.__commands:
+                self.dml = self.__commands[arg]()
+            case _:
+                # Error somehow or reject statement
+                pass
 
     def __select(self) -> SQL:
         return SQL('SELECT')
@@ -34,7 +34,7 @@ class Composer():
     
     @staticmethod
     def eq_stmt(column: Composable, field: Composable) -> SQL:
-        return SQL('{} = {}').format(column, Literal(field))
+        return SQL('{} = {}').format(column, field)
     
     @staticmethod
     def on(table: Composable, clause: Composable) -> SQL:
@@ -60,7 +60,10 @@ class Composer():
     def where(self, clause: Composable) -> Self:
         self.dml = Composer.my_format(self.where.__name__.upper(), self.dml, clause)
         return self
+    
+    def get_query(self) -> Composed:
+        return self.dml
 
-    def make_fields(self, *fields: Composable):
-        self.dml = SQL(' , ').join(fields)
-        return self
+    @staticmethod
+    def make_fields(*fields: Composable):
+        return SQL(' , ').join(fields)
