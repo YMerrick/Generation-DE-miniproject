@@ -3,3 +3,4 @@ from src.file_handler import CSVFile, MyFileHandler
 from src.menu import CSVListMenu
 from src.data_manager import DictDataManager, DataManagerInterface
 from src.app import main
+from src.compse_db_query import Composer
