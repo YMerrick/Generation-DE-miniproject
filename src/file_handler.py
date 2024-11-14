@@ -55,12 +55,12 @@ class DBHandler(DataHandler):
     def load(self) -> cursor:
         cur = self.conn.cursor()
         return cur
-    
+
     def save(self) -> bool:
         self.conn.commit()
         self.conn.close()
         return True
-    
+
     def get_tables(self) -> list:
         # Gets all the tables
         query = Composer('select')
