@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, Iterable
 
 from psycopg2.sql import SQL, Composable, Composed
 
@@ -41,12 +41,20 @@ class Composer():
         return SQL('{} ON {}').format(table, clause)
     
     @staticmethod
-    def my_format(keyword: str, before: Composable, after: Composable) -> SQL:
+    def my_format(keyword: str,
+                  before: Composable,
+                  after: Composable) -> SQL:
         stmt = f"{{}} {keyword} {{}}"
         return SQL(stmt).format(before, after)
     
+    def add_field(self, field: Composable) -> Self:
+        self.dml = SQL('{} {}').format(self.dml,
+                                       field)
+        return self
+    
     def into(self, table: Composable) -> Self:
-        self.dml = Composer.my_format(self.into.__name__.upper(), self.dml, table)
+        self.dml = Composer.my_format(self.into.__name__.upper(),
+                                      self.dml, table)
         return self
     
     def add_from(self, table: Composable) -> Self:
@@ -54,15 +62,36 @@ class Composer():
         return self
     
     def join(self, clause: Composable) -> Self:
-        self.dml = Composer.my_format(self.join.__name__.upper(), self.dml, clause)
+        self.dml = Composer.my_format(self.join.__name__.upper(),
+                                      self.dml, clause)
         return self
     
     def where(self, clause: Composable) -> Self:
-        self.dml = Composer.my_format(self.where.__name__.upper(), self.dml, clause)
+        self.dml = Composer.my_format(self.where.__name__.upper(),
+                                      self.dml,
+                                      clause)
         return self
     
     def get_query(self) -> Composed:
         return self.dml
+    
+    def returning(self, field: Composable) -> Self:
+        self.dml = Composer.my_format(self.returning.__name__.upper(),
+                                      self.dml,
+                                      field)
+        return self
+    
+    def values(self, field: Composable) -> Self:
+        self.dml = Composer.my_format(self.returning.__name__.upper(),
+                                      self.dml,
+                                      field)
+        return self
+        
+    def _set(self, field: Composable) -> Self:
+        self.dml = Composer.my_format('SET',
+                                      self.dml,
+                                      field)
+        return self
 
     @staticmethod
     def make_fields(*fields: Composable):
