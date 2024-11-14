@@ -15,6 +15,7 @@ Usage example:
 
 TO DO:
     * Finish module doc string
+    * Finish class doc strings
     * Implement database handler class (This should take the
         queries and run them)
 """
@@ -22,6 +23,12 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from csv import DictReader, DictWriter
 from typing import IO
+
+from psycopg2.extensions import connection, cursor
+import psycopg2
+from psycopg2.sql import Identifier, Literal
+
+from .compse_db_query import Composer
 
 
 class DataHandler(ABC):
@@ -35,6 +42,43 @@ class DataHandler(ABC):
         raise NotImplementedError()
 
 
+class DBHandler(DataHandler):
+    '''Handler for database connections.
+    
+    Handler class for a database. Establishes a connection and returns cursor
+    to be used.
+    '''
+    def __init__(self, **dsn: dict):
+        super().__init__()  
+        self.conn: connection = psycopg2.connect(**dsn)
+
+    def load(self) -> cursor:
+        cur = self.conn.cursor()
+        return cur
+    
+    def save(self) -> bool:
+        self.conn.commit()
+        self.conn.close()
+        return True
+    
+    def get_tables(self) -> list:
+        # Gets all the tables
+        query = Composer('select')
+        query.dml = Composer.my_format('', query.dml, Identifier('table_name'))
+
+        where_clause = Composer.eq_stmt(Identifier('table_schema'),
+                                        Literal('public'))
+
+        query = query.add_from(Identifier('information_schema','tables'))
+        query = query.where(where_clause)
+        cur = self.conn.cursor()
+        cur.execute(query.get_query())
+        response = [entry[0] for entry in cur.fetchall()]
+        cur.close()
+        return response
+        
+
+
 class MyFileHandler(DataHandler):
 
     def __init__(self, filepath: str):
@@ -43,7 +87,15 @@ class MyFileHandler(DataHandler):
 
 
 class CSVFile(MyFileHandler):
+    '''File handler for CSVs.
 
+    File handler that loads and saves in CSV format. Takes a filepath and uses
+    that for all IO operations.
+
+    Atributes:
+        filepath:
+            a string denoting file location for IO operation
+    '''
     def __init__(self, filepath: str):
         super().__init__(filepath)
 
