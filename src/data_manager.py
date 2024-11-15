@@ -181,7 +181,7 @@ class DictDataManager(DataManagerInterface):
             )
 
     # Only return selected columns
-    def select_columns(self, *cols: list[str]) -> list[dict] | None:
+    def select_columns(self, *cols: tuple[str]) -> list[dict] | None:
         for col in cols:
             if col not in self.get_keys():
                 return None

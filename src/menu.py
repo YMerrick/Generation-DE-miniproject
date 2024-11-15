@@ -23,7 +23,7 @@ from typing import Callable
 from tabulate import tabulate
 
 from .decorators import get_input, print_buffer, print_buffer_exit
-from .data_manager import DataManagerInterface, DictDataManager
+from .data_manager import DataManagerInterface, DictDataManager, DBDatamanager
 
 
 class Menu(ABC):
@@ -58,7 +58,8 @@ class Menu(ABC):
             f"2. Add {self.context}\n"
             f"3. Update existing {self.context}\n"
             f"4. Delete {self.context}\n"
-            f"0. Return to the main menu"
+            f"5. More print options\n"
+            f"0. Return to the main menu\n"
         )
 
     def validate_user_selection(self,
@@ -119,8 +120,8 @@ class Menu(ABC):
 class DBMenu(Menu):
 
     def __init__(self, context: str,
-                 input_data: DataManagerInterface):
-        super().__init__(context, input_data)
+                 data: DBDatamanager):
+        super().__init__(context, data)
 
     def print_entries(self):
         '''Ask user for filters then prints listings'''
@@ -227,9 +228,65 @@ class CSVListMenu(Menu):
                                 )
         print(tabular_form)
 
+    def menu_print(self):
+        print(
+            "1. Search for Item in a column\n"
+            "2. Select columns to display\n"
+            "0. Return to previous menu\n"
+        )
+
+    def search(self):
+        # Selects column and then enter search term
+        # Then prints returned data
+        columns: list = [{'columns': i} for i in self.data.get_keys()]
+        self.print_table(columns)
+        print('Please enter the number of the column for selection:\n')
+        user_selection = get_input("> ", 'int')
+        print('Please enter your search term:\n')
+        search_term = get_input("> ")
+        return_data = self.data.filter_on_column(columns.pop(user_selection - 1)['columns'], search_term)
+        if not return_data:
+            print("That column does not exist\nReturning to menu")
+            return
+        self.print_table(return_data)
+
+    def select_columns(self):
+        # Select columns to be displayed
+        print('Enter nothing to finalise selection')
+        columns: list = [{'columns': i} for i in self.data.get_keys()]
+        user_selection: list = []
+        self.print_table(columns)
+        # Keeps looping asking for columns until its matched the length or empty string is returned
+        while (user_input := get_input('Please enter the number of the columns you would like to select\n\n> ')):
+            user_input = int(user_input)
+            user_selection.append(columns.pop(user_input - 1)['columns'])
+            self.print_table(columns)
+        printing_data = self.data.select_columns(*user_selection)
+        if not printing_data:
+            print('You have selected nothing.\nReturning to menu')
+        self.print_table(printing_data)
+
+    def menu_print_choice(self):
+        print("Please enter a number to select your menu choice:\n")
+        user_input = get_input("> ", 'int')
+        match user_input:
+            case 1:
+                self.search()
+            case 2:
+                self.select_columns()
+            case 0:
+                return False
+            case _:
+                print("Please select a valid option")
+                print_buffer()
+        return True
+
     @print_buffer_exit
     def print_entries(self):
-        self.print_table(self.data.get_data())
+        # Adds extra print options and mini menu for it
+        self.menu_print()
+        while self.menu_print_choice():
+            self.menu_print()
 
     def add(self):
         new_dict = {}
@@ -274,16 +331,16 @@ class CSVListMenu(Menu):
         print("The above entry been DELETED!\n")
 
     def menu_choice(self) -> bool:
-        print("\nPlease enter a number to select your menu choice:\n")
+        print("Please enter a number to select your menu choice:\n")
         user_input = get_input("> ", 'int')
         print_buffer()
         match user_input:
             case 1:
-                self.print_entries()
+                self.print_table(self.data.get_data())
             case 2:
                 self.add()
             case 3:
-                self.print_entries()
+                self.print_table(self.data.get_data())
                 print("Enter 0 to EXIT\n")
                 self.validate_user_selection(
                     self.get_user_selection(),
@@ -292,12 +349,14 @@ class CSVListMenu(Menu):
                     self.get_new_property_value
                     )
             case 4:
-                self.print_entries()
+                self.print_table(self.data.get_data())
                 print("Enter 0 to EXIT\n")
                 self.validate_user_selection(
                     self.get_user_selection(),
                     self.delete
                     )
+            case 5:
+                self.print_entries()
             case 0:
                 return False
             case _:
