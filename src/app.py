@@ -13,7 +13,7 @@ TO DO:
     * database to csv
     *   
 '''
-from os import getenv
+from os import getenv, path
 
 from dotenv import load_dotenv
 import psycopg2 as psycopg
@@ -28,17 +28,19 @@ from .file_handler import MyFileHandler, CSVFile
 
 # PRINT main menu options GET user input for main menu option
 
-prod_handler = CSVFile('data/product_list.csv')
+work_dir = path.dirname(path.realpath(__file__))
+
+prod_handler = CSVFile(f'{work_dir}/../data/product_list.csv')
 prod_data = DictDataManager(prod_handler.load())
 prod_template = dict.fromkeys(prod_handler.get_headers())
 prod_menu = CSVListMenu('product', prod_data, prod_template)
 
-cour_handler = CSVFile('data/courier_list.csv')
+cour_handler = CSVFile(f'{work_dir}/../data/courier_list.csv')
 cour_data = DictDataManager(cour_handler.load())
 cour_template = dict.fromkeys(cour_handler.get_headers())
 courier_menu = CSVListMenu('courier', cour_data, cour_template)
 
-order_handler = CSVFile('data/order_list.csv')
+order_handler = CSVFile(f'{work_dir}/../data/order_list.csv')
 order_data = DictDataManager(order_handler.load())
 order_template = dict.fromkeys(order_handler.get_headers())
 ord_menu = CSVListMenu('order', order_data, order_template)
