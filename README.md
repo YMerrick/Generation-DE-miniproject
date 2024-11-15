@@ -16,6 +16,8 @@ This is a command line interface (CLI) application for a cheesemongers shop. The
 
 ## Running program Requirements
 
+This program rquires Python >= 3.12
+
 Before executing the next steps some set-up is required. Firstly, we have to install the requirements of the program. This is done by running the following command:
 
 ```console
@@ -44,7 +46,7 @@ Then run the following in a terminal:
 python -m pytest
 ```
 
-## Project Reflections
+# Project Reflections
 
 ### How did your design go about meeting the project's requirements?
 
