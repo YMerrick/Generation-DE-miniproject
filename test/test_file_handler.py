@@ -1,6 +1,7 @@
 import os
-import pytest
 from io import TextIOWrapper
+
+import pytest
 
 from src import CSVFile
 from src.file_handler import DataHandler
