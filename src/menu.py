@@ -123,10 +123,29 @@ class DBMenu(Menu):
                  data: DBDatamanager):
         super().__init__(context, data)
 
+        {
+            'default': 'table_name to pull from',
+            'links': { # Relative to the current table
+                'table_name': 'column_name'
+            },
+            'tables': {
+                ''
+            },
+        }
+
     def print_entries(self):
         '''Ask user for filters then prints listings'''
         return super().print_entries()
     
+    def add(self):
+        pass
+
+    def update(self):
+        pass
+
+    def delete(self):
+        pass
+
     def menu_choice(self) -> bool:
         print("\nPlease enter a number to select your menu choice:\n")
         user_input = get_input("> ", 'int')
@@ -235,6 +254,7 @@ class CSVListMenu(Menu):
             "0. Return to previous menu\n"
         )
 
+    @print_buffer_exit
     def search(self):
         # Selects column and then enter search term
         # Then prints returned data
@@ -246,10 +266,11 @@ class CSVListMenu(Menu):
         search_term = get_input("> ")
         return_data = self.data.filter_on_column(columns.pop(user_selection - 1)['columns'], search_term)
         if not return_data:
-            print("That column does not exist\nReturning to menu")
+            print("That column/entry does not exist\nReturning to menu\n\n")
             return
         self.print_table(return_data)
 
+    @print_buffer_exit
     def select_columns(self):
         # Select columns to be displayed
         print('Enter nothing to finalise selection')
@@ -259,6 +280,8 @@ class CSVListMenu(Menu):
         # Keeps looping asking for columns until its matched the length or empty string is returned
         while (user_input := get_input('Please enter the number of the columns you would like to select\n\n> ')):
             user_input = int(user_input)
+            if user_input > len(columns) or user_input < 1:
+                continue
             user_selection.append(columns.pop(user_input - 1)['columns'])
             self.print_table(columns)
         printing_data = self.data.select_columns(*user_selection)

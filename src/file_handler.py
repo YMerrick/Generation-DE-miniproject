@@ -22,7 +22,7 @@ TO DO:
 from abc import ABC, abstractmethod
 from pathlib import Path
 from csv import DictReader, DictWriter
-from typing import IO
+from typing import IO, Iterable
 
 from psycopg2.extensions import connection, cursor
 import psycopg2
@@ -76,7 +76,52 @@ class DBHandler(DataHandler):
         response = [entry[0] for entry in cur.fetchall()]
         cur.close()
         return response
+    
+    def convert_to_list(self, headers: Iterable,
+                        data: Iterable[Iterable]) -> list[dict]:
+        return [{header: value for header, value in zip(headers, row)} for row in data]
+    
+    def get_foreign_links(self) -> list[dict]:
+        tc = Identifier('information_schema', 'table_constraints')
+        kcu = Identifier('information_schema', 'key_column_usage')
+        ccu = Identifier('information_schema', 'constraint_column_usage')
+        headers = [
+            Identifier(*tc.strings, 'table_name'),
+            Identifier(*kcu.strings, 'column_name'),
+            Composer.my_format('as', Identifier(*ccu.strings, 'table_name'),
+                               Literal('foreign_table_name')),
+            Composer.my_format('as', Identifier(*ccu.strings, 'column_name'),
+                               Literal('foreign_column_name'))
+        ]
+        fields = Composer.make_fields(*headers)
+        tc_constraint_name = Identifier(*tc.strings, 'constraint_name')
+        constraint_name_condition = Composer.eq_stmt(tc_constraint_name,
+                                                     Identifier(*kcu.strings, 'constraint_name'))
+        table_schema_condition = Composer.eq_stmt(Identifier(*tc.strings, 'table_schema'),
+                                                  Identifier(*kcu.strings, 'table_schema'))
+        second_join_condition = Composer.eq_stmt(Identifier(*ccu.strings, 'constraint_name'),
+                                              tc_constraint_name)
+        first_join_condition = Composer.my_format('AND', constraint_name_condition, table_schema_condition)
+
+        first_where_condition = Composer.eq_stmt(Identifier(*tc.strings, 'constraint_type'),
+                                                 Literal('FOREIGN KEY'))
         
+        second_where_condition = Composer.eq_stmt(Identifier(*tc.strings, 'table_schema'),
+                                                  Literal('public'))
+        
+        where_condition = Composer.my_format('AND',
+                                             first_where_condition,
+                                             second_where_condition)
+
+        sql = Composer('select')
+        sql.add_field(fields).add_from(tc)
+        sql.join(Composer.on(kcu, first_join_condition))
+        sql.join(Composer.on(ccu, second_join_condition))
+        sql.where(where_condition)
+        cur = self.conn.cursor()
+        self.convert_to_list(
+            (header for header in headers)
+        )
 
 
 class MyFileHandler(DataHandler):

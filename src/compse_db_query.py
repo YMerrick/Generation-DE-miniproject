@@ -17,8 +17,7 @@ class Composer():
             case arg if arg in self.__commands:
                 self.dml = self.__commands[arg]()
             case _:
-                # Error somehow or reject statement
-                pass
+                raise ValueError('Unknown CRUD keyword')
 
     def __select(self) -> SQL:
         return SQL('SELECT')
@@ -31,6 +30,10 @@ class Composer():
 
     def __delete(self) -> SQL:
         return SQL('DELETE')
+
+    @staticmethod
+    def make_fields(*fields: Composable):
+        return SQL(' , ').join(fields)
     
     @staticmethod
     def eq_stmt(column: Composable, field: Composable) -> SQL:
@@ -92,7 +95,3 @@ class Composer():
                                       self.dml,
                                       field)
         return self
-
-    @staticmethod
-    def make_fields(*fields: Composable):
-        return SQL(' , ').join(fields)
